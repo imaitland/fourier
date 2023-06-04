@@ -1,7 +1,6 @@
 mod utils;
 use std::f64;
 use wasm_bindgen::prelude::*;
-
 use wasm_bindgen::JsCast;
 use web_sys::CanvasRenderingContext2d;
 
@@ -37,43 +36,6 @@ fn get_canvas_context() -> web_sys::CanvasRenderingContext2d {
 }
 
 #[wasm_bindgen]
-pub fn draw_circle(center_x: f64, center_y: f64, radius: f64) {
-    let context = get_canvas_context();
-
-    context.begin_path();
-    // Draw the outer circle.
-    context
-        .arc(center_x, center_y, radius, 0.0, f64::consts::PI * 2.0)
-        .unwrap();
-
-    context.stroke();
-}
-
-#[wasm_bindgen]
-pub fn clear_canvas() {
-    let canvas = get_canvas();
-    let context = get_canvas_context();
-    context.clear_rect(0.0, 0.0, canvas.width() as f64, canvas.height() as f64);
-}
-
-#[wasm_bindgen]
-pub fn draw_line(start_x: f64, start_y: f64, end_x: f64, end_y: f64) {
-    let context = get_canvas_context();
-    // draw a line from start to end
-    context.begin_path();
-    context.move_to(start_x, start_y);
-    context.line_to(end_x, end_y);
-    context.stroke();
-}
-
-// Consider moving to own file
-
-struct Point {
-    x: f64,
-    y: f64,
-}
-
-#[wasm_bindgen]
 pub struct Shape {
     context: CanvasRenderingContext2d,
     started: bool,
@@ -94,8 +56,8 @@ impl Shape {
     }
 
     pub fn begin_shape(&mut self, x: f64, y: f64) {
-        self.context.begin_path();
         self.context.move_to(x, y);
+        self.context.begin_path();
         self.started = true;
         self.last_point = Some((x, y));
     }
@@ -107,7 +69,6 @@ impl Shape {
         self.context.line_to(x, y);
         // Turn this off to see a line from the origin to the first vertex, to the current vertex
         self.context.move_to(x, y);
-        self.last_point = Some((x, y));
     }
 
     pub fn end_shape(&mut self) {
@@ -148,7 +109,7 @@ impl Canvas {
         self.context.stroke();
     }
 
-    pub fn draw_circle(&self, x: f64, y: f64, radius: f64) {
+    pub fn circle(&self, x: f64, y: f64, radius: f64) {
         self.context.begin_path();
         self.context
             .arc(x, y, radius, 0.0, 2.0 * std::f64::consts::PI)
