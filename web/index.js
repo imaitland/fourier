@@ -26,6 +26,9 @@ function step() {
   const updated_y = radius * Math.sin(time) + center_y;
   // Wave...
   wave.unshift(updated_y);
+  if (wave.length > 200) {
+    wave.pop();
+  }
 
   let shape = new Shape();
   let offset = 200;
