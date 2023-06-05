@@ -1,17 +1,7 @@
 import { Shape, Canvas } from "fourier-front-end";
 
-const radius = 50;
-const center_x = 75;
-const center_y = 75;
-
 // Requires a canvas element with id="canvas"
 let canvas = new Canvas();
-
-// Main Circle
-canvas.circle(center_x, center_y, radius);
-
-// Perimeter point
-canvas.circle(center_x + radius, center_y, 3);
 
 // animation ticker
 let time = 0;
@@ -19,13 +9,37 @@ let wave = [];
 
 function step() {
   canvas.clear();
-  // Outer Circle
-  canvas.circle(center_x, center_y, radius);
 
-  const updated_x = radius * Math.cos(time) + center_x;
-  const updated_y = radius * Math.sin(time) + center_y;
-  // Wave...
-  wave.unshift(updated_y);
+  let x = 75;
+  let y = 75;
+
+  // Perimeter point, updated each frame, based on time. This is the fourier series, for n.
+  // where n is 1,3,5,7,9,11...
+  for (let i = 0; i < 5; i++) {
+    let prev_x = x;
+    let prev_y = y;
+
+    const n = 2 * i + 1;
+    const radius = 40 * (4 / (n * Math.PI));
+
+    x += radius * Math.cos(n * time);
+    y += radius * Math.sin(n * time);
+
+    // Circle
+    canvas.circle(prev_x, prev_y, radius);
+
+    // Perimeter point
+    canvas.circle(x, y, 1);
+
+    // Line from perimeter point to wave
+    canvas.line(prev_x, prev_y, x, y);
+  }
+
+  // Wave.
+  const center_x = 100;
+  const center_y = 100;
+
+  wave.unshift(y);
   if (wave.length > 200) {
     wave.pop();
   }
@@ -42,16 +56,11 @@ function step() {
   }
 
   shape.end_shape();
-  // Perimeter point
-  canvas.circle(updated_x, updated_y, 3);
-
-  // Line from center to perimeter point
-  canvas.line(center_x, center_y, updated_x, updated_y);
   // Line from perimeter point to wave
-  canvas.line(updated_x, updated_y, center_x + offset, wave[0]);
+  canvas.line(x, y, center_x + offset, wave[0]);
 
   window.requestAnimationFrame(step);
-  time += 0.05;
+  time += 0.03;
 }
 
 window.requestAnimationFrame(step);
