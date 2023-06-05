@@ -6,16 +6,22 @@ let canvas = new Canvas();
 // animation ticker
 let time = 0;
 let wave = [];
+let sliderVal = 1;
+
+document.getElementById("slider").addEventListener("input", (e) => {
+  sliderVal = e.target.value;
+  console.log(sliderVal);
+});
 
 function step() {
   canvas.clear();
 
-  let x = 75;
-  let y = 75;
+  let x = 120;
+  let y = 120;
 
   // Perimeter point, updated each frame, based on time. This is the fourier series, for n.
   // where n is 1,3,5,7,9,11...
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < sliderVal; i++) {
     let prev_x = x;
     let prev_y = y;
 
