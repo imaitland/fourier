@@ -1,16 +1,15 @@
 import { Shape, Canvas } from "fourier-front-end";
 
 // Requires a canvas element with id="canvas"
-let canvas = new Canvas();
+let canvas = new Canvas("canvas");
 
 // animation ticker
 let time = 0;
 let wave = [];
-let sliderVal = 1;
+let sliderVal = 2;
 
 document.getElementById("slider").addEventListener("input", (e) => {
   sliderVal = e.target.value;
-  console.log(sliderVal);
 });
 
 function step() {
@@ -50,7 +49,7 @@ function step() {
     wave.pop();
   }
 
-  let shape = new Shape();
+  let shape = new Shape("canvas");
   let offset = 200;
   let wave_x = center_x + offset;
 

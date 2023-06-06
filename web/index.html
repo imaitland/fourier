@@ -2,7 +2,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Hello wasm-pack!</title>
+    <title>Hello Fourier</title>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <noscript
@@ -10,23 +11,37 @@
       javascript in your browser.</noscript
     >
     <script src="./bootstrap.js"></script>
-    <div>
-      <input
-        type="range"
-        min="1"
-        max="10"
-        value="1"
-        id="slider"
-        style="width: 600px"
-      />
-    </div>
-    <div>
+    <div id="flex-container">
+      <p>Convergence of the Fourier Series</p>
+      <div id="flex-row">
+        <p>n =</p>
+        <input
+          type="range"
+          min="1"
+          max="10"
+          value="2"
+          id="slider"
+          oninput="this.nextElementSibling.value = this.value"
+        />
+        <output>2</output>
+      </div>
       <canvas
         id="canvas"
         height="240"
         width="600"
         style="border: 1px solid #000000"
       ></canvas>
+    </div>
+    <div id="flex-container">
+      <p>Discrete Fourier Transform of Random Input Signal</p>
+      <div>
+        <canvas
+          id="dft_canvas"
+          height="240"
+          width="600"
+          style="border: 1px solid #000000"
+        ></canvas>
+      </div>
     </div>
   </body>
 </html>

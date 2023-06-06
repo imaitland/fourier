@@ -4,36 +4,14 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::CanvasRenderingContext2d;
 
+use num::complex::Complex64;
+use rustfft::FftPlanner;
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-fn get_canvas() -> web_sys::HtmlCanvasElement {
-    let document = web_sys::window().unwrap().document().unwrap();
-
-    let canvas = document.get_element_by_id("canvas").unwrap();
-    let canvas: web_sys::HtmlCanvasElement = canvas
-        .dyn_into::<web_sys::HtmlCanvasElement>()
-        .map_err(|_| ())
-        .unwrap();
-
-    canvas
-}
-
-fn get_canvas_context() -> web_sys::CanvasRenderingContext2d {
-    let canvas = get_canvas();
-
-    let context: web_sys::CanvasRenderingContext2d = canvas
-        .get_context("2d")
-        .unwrap()
-        .unwrap()
-        .dyn_into::<web_sys::CanvasRenderingContext2d>()
-        .unwrap();
-
-    context
-}
 
 #[wasm_bindgen]
 pub struct Shape {
@@ -45,8 +23,18 @@ pub struct Shape {
 #[wasm_bindgen]
 impl Shape {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Self {
-        let context = get_canvas_context();
+    pub fn new(canvas_id: &str) -> Self {
+        let window = web_sys::window().unwrap();
+        let document = window.document().unwrap();
+        let canvas = document.get_element_by_id(canvas_id).unwrap();
+        let canvas: web_sys::HtmlCanvasElement =
+            canvas.dyn_into::<web_sys::HtmlCanvasElement>().unwrap();
+        let context = canvas
+            .get_context("2d")
+            .unwrap()
+            .unwrap()
+            .dyn_into::<CanvasRenderingContext2d>()
+            .unwrap();
 
         Self {
             context: context,
@@ -86,10 +74,10 @@ pub struct Canvas {
 #[wasm_bindgen]
 impl Canvas {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Self {
+    pub fn new(canvas_id: &str) -> Self {
         let window = web_sys::window().unwrap();
         let document = window.document().unwrap();
-        let canvas = document.get_element_by_id("canvas").unwrap();
+        let canvas = document.get_element_by_id(canvas_id).unwrap();
         let canvas: web_sys::HtmlCanvasElement =
             canvas.dyn_into::<web_sys::HtmlCanvasElement>().unwrap();
         let context = canvas
@@ -123,4 +111,80 @@ impl Canvas {
         let height = canvas.height() as f64;
         self.context.clear_rect(0.0, 0.0, width, height);
     }
+}
+
+#[wasm_bindgen]
+pub struct Spectrum {
+    frequency: Vec<f64>,
+    real: Vec<f64>,
+    imaginary: Vec<f64>,
+    amplitude: Vec<f64>,
+    phase: Vec<f64>,
+}
+
+#[wasm_bindgen]
+impl Spectrum {
+    pub fn new(
+        frequency: Vec<f64>,
+        real: Vec<f64>,
+        imaginary: Vec<f64>,
+        amplitude: Vec<f64>,
+        phase: Vec<f64>,
+    ) -> Spectrum {
+        Spectrum {
+            frequency,
+            real,
+            imaginary,
+            amplitude,
+            phase,
+        }
+    }
+
+    // getters for each component
+    pub fn frequency(&self) -> Vec<f64> {
+        self.frequency.clone()
+    }
+
+    pub fn real(&self) -> Vec<f64> {
+        self.real.clone()
+    }
+
+    pub fn imaginary(&self) -> Vec<f64> {
+        self.imaginary.clone()
+    }
+
+    pub fn amplitude(&self) -> Vec<f64> {
+        self.amplitude.clone()
+    }
+
+    pub fn phase(&self) -> Vec<f64> {
+        self.phase.clone()
+    }
+}
+
+#[wasm_bindgen]
+pub fn compute_spectrum(signal: &[f64]) -> Spectrum {
+    let n_samples = signal.len();
+    let mut planner = FftPlanner::new();
+    let fft = planner.plan_fft_forward(n_samples);
+
+    let mut buffer: Vec<Complex64> = signal.iter().map(|&x| Complex64::new(x, 0.0)).collect();
+
+    fft.process(&mut buffer);
+
+    let mut frequency = Vec::new();
+    let mut real = Vec::new();
+    let mut imaginary = Vec::new();
+    let mut amplitude = Vec::new();
+    let mut phase = Vec::new();
+
+    for (i, &c) in buffer.iter().enumerate() {
+        frequency.push(i as f64);
+        real.push(c.re);
+        imaginary.push(c.im);
+        amplitude.push(2.0 * c.norm() / n_samples as f64);
+        phase.push(c.arg());
+    }
+
+    Spectrum::new(frequency, real, imaginary, amplitude, phase)
 }
