@@ -13,7 +13,8 @@ function epicycles(x, y, rotation, fourier) {
     let prev_y = y;
 
     const freq = fourier[i].freq;
-    const radius = fourier[i].amp;
+    // Scale down our drawing, by a factor of 3.
+    const radius = fourier[i].amp / 3;
     const phase = fourier[i].phase;
 
     x += radius * Math.cos(freq * time + phase + rotation);
@@ -63,13 +64,11 @@ d.real().map((re, ix) => {
 
 fourier = fourier.sort((a, b) => b.amp - a.amp);
 
-console.log("Fourier: ", fourier);
-
 function step() {
   canvas.clear();
 
-  let x = 250;
-  let y = 250;
+  let x = 140;
+  let y = 200;
 
   // Epicycles returns the last point in that sequence of epicycles.
   let vx = epicycles(x, y, 0, fourier);
@@ -80,22 +79,22 @@ function step() {
 
   path.unshift(vx);
 
-  if (path.length > 5000) {
+  if (path.length > 600) {
     path.pop();
   }
 
   let shape = new Shape("dft_complex_canvas");
-  let offset = 200;
+  let offset = 270;
 
   shape.begin_shape(center_x, center_y);
 
   for (let i = 0; i < path.length; i++) {
-    shape.vertex(path[i][0] + 200, path[i][1]);
+    shape.vertex(path[i][0] + offset, path[i][1]);
   }
 
   shape.end_shape();
   // Line from perimeter point to wave
-  canvas.line(path[0][0], path[0][1], path[0][0] + 200, path[0][1]);
+  canvas.line(path[0][0], path[0][1], path[0][0] + offset, path[0][1]);
 
   const dt = (2 * Math.PI) / fourier.length;
   time += dt;

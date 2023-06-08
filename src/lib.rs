@@ -234,3 +234,63 @@ pub fn compute_complex_spectrum(sig: JsValue) -> Spectrum {
 
     Spectrum::new(frequency, real, imaginary, amplitude, phase)
 }
+
+#[wasm_bindgen]
+pub fn svg_to_xy(svg: JsValue) -> () {
+    let svg: String = svg.into_serde().unwrap();
+    let svg = svg::parse(&svg).unwrap();
+    let mut points: Vec<(f64, f64)> = Vec::new();
+    for path in svg.paths {
+        for subpath in path.subpaths {
+            for segment in subpath.segments {
+                match segment {
+                    svg::PathSegment::Line(svg::Line { from, to }) => {
+                        points.push((from.x, from.y));
+                        points.push((to.x, to.y));
+                    }
+                    svg::PathSegment::Quadratic(svg::Quadratic { from, ctrl, to }) => {
+                        points.push((from.x, from.y));
+                        points.push((ctrl.x, ctrl.y));
+                        points.push((to.x, to.y));
+                    }
+                    svg::PathSegment::Cubic(svg::Cubic {
+                        from,
+                        ctrl1,
+                        ctrl2,
+                        to,
+                    }) => {
+                        points.push((from.x, from.y));
+                        points.push((ctrl1.x, ctrl1.y));
+                        points.push((ctrl2.x, ctrl2.y));
+                        points.push((to.x, to.y));
+                    }
+                    svg::PathSegment::ClosePath => {}
+                }
+            }
+        }
+    }
+    let points = Array::from(&points[..]);
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let canvas = document.get_element_by_id("canvas").unwrap();
+    let canvas: web_sys::HtmlCanvasElement =
+        canvas.dyn_into::<web_sys::HtmlCanvasElement>().unwrap();
+    let context = canvas
+        .get_context("2d")
+        .unwrap()
+        .unwrap()
+        .dyn_into::<CanvasRenderingContext2d>()
+        .unwrap();
+    context.begin_path();
+    context.move_to(
+        points.get_index(0).as_f64().unwrap(),
+        points.get_index(1).as_f64().unwrap(),
+    );
+    for i in 2..points.length() {
+        context.line_to(
+            points.get_index(i).as_f64().unwrap(),
+            points.get_index(i + 1).as_f64().unwrap(),
+        );
+    }
+    context.stroke();
+}

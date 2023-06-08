@@ -58,6 +58,8 @@ d.real().map((re, ix) => {
 // (by being able to draw epicycles that rotate in the opposite direction).
 fourierY = fourierY.filter((item, index) => index < fourierY.length / 2);
 
+fourierY = fourierY.sort((a, b) => b.amp - a.amp);
+
 function step() {
   canvas.clear();
 
