@@ -1,8 +1,13 @@
 mod utils;
+use js_sys::Array;
+use num::Complex;
 use std::f64;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use wasm_bindgen::JsValue;
 use web_sys::CanvasRenderingContext2d;
+
+use serde::{Deserialize, Serialize};
 
 use num::complex::Complex64;
 use rustfft::FftPlanner;
@@ -169,6 +174,47 @@ pub fn compute_spectrum(signal: &[f64]) -> Spectrum {
     let fft = planner.plan_fft_forward(n_samples);
 
     let mut buffer: Vec<Complex64> = signal.iter().map(|&x| Complex64::new(x, 0.0)).collect();
+
+    fft.process(&mut buffer);
+
+    let mut frequency = Vec::new();
+    let mut real = Vec::new();
+    let mut imaginary = Vec::new();
+    let mut amplitude = Vec::new();
+    let mut phase = Vec::new();
+
+    for (i, &c) in buffer.iter().enumerate() {
+        frequency.push(i as f64);
+        real.push(c.re);
+        imaginary.push(c.im);
+        amplitude.push(2.0 * c.norm() / n_samples as f64);
+        phase.push(c.arg());
+    }
+
+    Spectrum::new(frequency, real, imaginary, amplitude, phase)
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct InputSignal {
+    pub sig: Vec<(f64, f64)>,
+}
+
+// takes an array of arrays of length 2 with the first element being the real part and the second element being the imaginary part
+#[wasm_bindgen]
+pub fn compute_complex_spectrum(sig: JsValue) -> Spectrum {
+    let signal: InputSignal = serde_wasm_bindgen::from_value::<InputSignal>(sig).unwrap();
+
+    let sig: Vec<(f64, f64)> = signal.sig;
+
+    let n_samples: usize = sig.len();
+
+    let mut planner: FftPlanner<_> = FftPlanner::new();
+    let fft = planner.plan_fft_forward(n_samples);
+
+    let mut buffer: Vec<Complex<f64>> = sig
+        .into_iter()
+        .map(|x: (f64, f64)| Complex::new(x.0, x.1))
+        .collect();
 
     fft.process(&mut buffer);
 
