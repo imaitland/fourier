@@ -8,3 +8,6 @@ import("./dft.js").catch((e) => console.error("Error importing `dft.js`:", e));
 import("./dft_complex.js").catch((e) =>
   console.error("Error importing `dft_complex.js`:", e)
 );
+import("./dft_svg.js").catch((e) =>
+  console.error("Error importing `dft_complex.js`:", e)
+);

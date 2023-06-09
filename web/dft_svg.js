@@ -1,5 +1,5 @@
 import { Shape, Canvas, compute_spectrum_js } from "fourier-front-end";
-import { drawing } from "./drawing.js";
+import { avatar } from "./avatar.js";
 import { logo } from "./coding_train_logo.js";
 
 // animation ticker
@@ -13,8 +13,8 @@ function epicycles(x, y, rotation, fourier) {
     let prev_y = y;
 
     const freq = fourier[i].freq;
-    // Scale down our drawing, by a factor of 3.
-    const radius = fourier[i].amp / 3;
+    // Scale down our drawing, by a factor of 100.
+    const radius = fourier[i].amp / 10;
     const phase = fourier[i].phase;
 
     x += radius * Math.cos(freq * time + phase + rotation);
@@ -34,37 +34,40 @@ function epicycles(x, y, rotation, fourier) {
   return [x, y];
 }
 
-// Requires a canvas element with id="canvas"
-let canvas = new Canvas("dft_complex_canvas");
+function genFourier(d) {
+  let fourier = [];
 
-// only take every 8th point from the logo.
-let input_signal = logo.filter((item, ix) => {
-  return ix % 8 === 0;
-});
+  const imaginaries = d.imaginary();
+  const amplitudes = d.amplitude();
+  const phases = d.phase();
+  const frequencies = d.frequency();
+
+  d.real().map((re, ix) => {
+    fourier.push({
+      re: re,
+      imag: imaginaries[ix],
+      amp: amplitudes[ix],
+      phase: phases[ix],
+      freq: frequencies[ix],
+    });
+  });
+  fourier = fourier.sort((a, b) => b.amp - a.amp);
+  return fourier;
+}
+
+// Requires a canvas element with id="canvas"
+let canvas = new Canvas("dft_svg_canvas");
+
+let input_signal = avatar;
 
 // This will "decompose" our input signal into its constituent waves.
 let d = compute_spectrum_js({ sig: input_signal });
+let fourier = genFourier(d);
 
-let fourier = [];
-
-const imaginaries = d.imaginary();
-const amplitudes = d.amplitude();
-const phases = d.phase();
-const frequencies = d.frequency();
-
-d.real().map((re, ix) => {
-  fourier.push({
-    re: re,
-    imag: imaginaries[ix],
-    amp: amplitudes[ix],
-    phase: phases[ix],
-    freq: frequencies[ix],
-  });
-});
-
-fourier = fourier.sort((a, b) => b.amp - a.amp);
+const maxPathLength = fourier.length;
 
 function step() {
+  let draw = true;
   canvas.clear();
 
   let x = 140;
@@ -76,25 +79,33 @@ function step() {
   // Draw the wave.
   const center_x = 100;
   const center_y = 100;
-
+  // add to beginning.
   path.unshift(vx);
 
-  if (path.length > 600) {
+  if (path.length === maxPathLength + 5) {
+    // remove from end
     path.pop();
   }
 
-  let shape = new Shape("dft_complex_canvas");
+  let shape = new Shape("dft_svg_canvas");
   let offset = 270;
 
   shape.begin_shape(center_x, center_y);
 
   for (let i = 0; i < path.length; i++) {
-    shape.vertex(path[i][0] + offset, path[i][1]);
+    // check if subsequent points are nearby on the x axis, if they are far apart, move the pen to the new point without drawing it.
+    if (i < path.length - 2) {
+      if (Math.abs(path[i][0] - path[i + 1][0]) > 10) {
+        shape.move_to(path[i + 1][0] + offset, path[i + 1][1]);
+      } else {
+        shape.vertex(path[i][0] + offset, path[i][1]);
+      }
+    }
   }
 
   shape.end_shape();
   // Line from perimeter point to wave
-  canvas.line(path[0][0], path[0][1], path[0][0] + offset, path[0][1]);
+  draw && canvas.line(path[0][0], path[0][1], path[0][0] + offset, path[0][1]);
 
   const dt = (2 * Math.PI) / fourier.length;
   time += dt;

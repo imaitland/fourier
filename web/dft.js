@@ -13,52 +13,63 @@ function noise(x, y) {
   return dotProduct * 2 - 1;
 }
 
+function randomizeSignal(samplingRate, amplitude, duration) {
+  let random_signal = [];
+
+  for (let i = 0; i < duration * samplingRate; i++) {
+    let t = i / samplingRate; // Convert index to time
+    random_signal.push(amplitude * noise(t, t));
+  }
+  return random_signal;
+}
+
+function genFourier(d) {
+  let fourier = [];
+  const imginaries = d.imaginary();
+  const amplitudes = d.amplitude();
+  const phases = d.phase();
+  const frequencies = d.frequency();
+
+  d.real().map((re, ix) => {
+    fourier.push({
+      re: re,
+      imag: imginaries[ix],
+      amp: amplitudes[ix],
+      phase: phases[ix],
+      freq: frequencies[ix],
+    });
+  });
+
+  // Filter our negative frequencies (they will cancel out any positive ones).
+  // Our rust fft, will decompose a single sine single wave into two waves, one positive, one negative.
+  // When plotted they cancel, resulting in a flat line.
+  // We could adapt our drawing method to handle negative frequencies
+  // (by being able to draw epicycles that rotate in the opposite direction).
+  fourier = fourier.filter((item, index) => index < fourier.length / 2);
+
+  fourier = fourier.sort((a, b) => b.amp - a.amp);
+  return fourier;
+}
+
 // Requires a canvas element with id="canvas"
 let canvas = new Canvas("dft_canvas");
+
+let input_signal = randomizeSignal(11, 20, 1);
+let d = compute_spectrum(input_signal);
+let fourier = genFourier(d);
+
+document.getElementById("randomize").addEventListener("click", (e) => {
+  const randomSamplingRate = Math.floor(Math.random() * 20) + 1;
+  const randomAmplitude = Math.floor(Math.random() * 20) + 1;
+  const randomDuration = Math.floor(Math.random() * 2) + 1;
+  input_signal = randomizeSignal(11, 30, 1);
+  d = compute_spectrum(input_signal);
+  fourier = genFourier(d);
+});
 
 // animation ticker
 let time = 0;
 let wave = [];
-
-let input_signal = [];
-
-let amplitude = 20; // Peak value
-let frequency = 10; // Frequency in Hz
-let samplingRate = 11; // Samples per second
-let duration = 1; // Duration in seconds
-
-for (let i = 0; i < duration * samplingRate; i++) {
-  let t = i / samplingRate; // Convert index to time
-  input_signal.push(amplitude * noise(t, t));
-}
-
-// This will "decompose" our input signal into its constituent waves.
-let d = compute_spectrum(input_signal);
-
-let fourierY = [];
-const imginaries = d.imaginary();
-const amplitudes = d.amplitude();
-const phases = d.phase();
-const frequencies = d.frequency();
-
-d.real().map((re, ix) => {
-  fourierY.push({
-    re: re,
-    imag: imginaries[ix],
-    amp: amplitudes[ix],
-    phase: phases[ix],
-    freq: frequencies[ix],
-  });
-});
-
-// Filter our negative frequencies (they will cancel out any positive ones).
-// Our rust fft, will decompose a single sine single wave into two waves, one positive, one negative.
-// When plotted they cancel, resulting in a flat line.
-// We could adapt our drawing method to handle negative frequencies
-// (by being able to draw epicycles that rotate in the opposite direction).
-fourierY = fourierY.filter((item, index) => index < fourierY.length / 2);
-
-fourierY = fourierY.sort((a, b) => b.amp - a.amp);
 
 function step() {
   canvas.clear();
@@ -72,15 +83,15 @@ function step() {
   // First we init all the y coords, to represent an arbtrary signal. (later we'll swap this out with a drawing)
   // Demo signal is a sine wave.
 
-  // Having broken down our signal, we need to loop through the fourierY array, and draw a circle for each one.
+  // Having broken down our signal, we need to loop through the fourier array, and draw a circle for each one.
   // consider sorting fourier Y by amplitude, so that we draw the largest circles first, or last depending.
-  for (let i = 0; i < fourierY.length; i++) {
+  for (let i = 0; i < fourier.length; i++) {
     let prev_x = x;
     let prev_y = y;
 
-    const freq = fourierY[i].freq;
-    const radius = fourierY[i].amp;
-    const phase = fourierY[i].phase;
+    const freq = fourier[i].freq;
+    const radius = fourier[i].amp;
+    const phase = fourier[i].phase;
 
     x += radius * Math.cos(freq * time + phase); // consider only adding phase
     y += radius * Math.sin(freq * time + phase);
@@ -119,7 +130,7 @@ function step() {
   // Line from perimeter point to wave
   canvas.line(x, y, center_x + offset, wave[0]);
 
-  const dt = (0.1 * Math.PI) / fourierY.length;
+  const dt = (0.1 * Math.PI) / fourier.length;
   time += dt;
   window.requestAnimationFrame(step);
 }

@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use num::complex::Complex64;
 use rustfft::FftPlanner;
+use svg;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -64,6 +65,13 @@ impl Shape {
         self.context.move_to(x, y);
     }
 
+    pub fn move_to(&mut self, x: f64, y: f64) {
+        if !self.started {
+            return;
+        }
+        self.context.move_to(x, y);
+    }
+
     pub fn end_shape(&mut self) {
         self.context.close_path();
         self.context.stroke();
@@ -100,6 +108,10 @@ impl Canvas {
         self.context.move_to(x1, y1);
         self.context.line_to(x2, y2);
         self.context.stroke();
+    }
+
+    pub fn move_to(&self, x: f64, y: f64) {
+        self.context.move_to(x, y);
     }
 
     pub fn circle(&self, x: f64, y: f64, radius: f64) {
@@ -199,13 +211,14 @@ pub struct InputSignal {
     pub sig: Vec<(f64, f64)>,
 }
 
-// takes an array of arrays of length 2 with the first element being the real part and the second element being the imaginary part
 #[wasm_bindgen]
-pub fn compute_complex_spectrum(sig: JsValue) -> Spectrum {
+pub fn compute_spectrum_js(sig: JsValue) -> Spectrum {
     let signal: InputSignal = serde_wasm_bindgen::from_value::<InputSignal>(sig).unwrap();
+    compute_complex_spectrum(signal.sig)
+}
 
-    let sig: Vec<(f64, f64)> = signal.sig;
-
+// takes an array of arrays of length 2 with the first element being the real part and the second element being the imaginary part
+pub fn compute_complex_spectrum(sig: Vec<(f64, f64)>) -> Spectrum {
     let n_samples: usize = sig.len();
 
     let mut planner: FftPlanner<_> = FftPlanner::new();
@@ -233,64 +246,4 @@ pub fn compute_complex_spectrum(sig: JsValue) -> Spectrum {
     }
 
     Spectrum::new(frequency, real, imaginary, amplitude, phase)
-}
-
-#[wasm_bindgen]
-pub fn svg_to_xy(svg: JsValue) -> () {
-    let svg: String = svg.into_serde().unwrap();
-    let svg = svg::parse(&svg).unwrap();
-    let mut points: Vec<(f64, f64)> = Vec::new();
-    for path in svg.paths {
-        for subpath in path.subpaths {
-            for segment in subpath.segments {
-                match segment {
-                    svg::PathSegment::Line(svg::Line { from, to }) => {
-                        points.push((from.x, from.y));
-                        points.push((to.x, to.y));
-                    }
-                    svg::PathSegment::Quadratic(svg::Quadratic { from, ctrl, to }) => {
-                        points.push((from.x, from.y));
-                        points.push((ctrl.x, ctrl.y));
-                        points.push((to.x, to.y));
-                    }
-                    svg::PathSegment::Cubic(svg::Cubic {
-                        from,
-                        ctrl1,
-                        ctrl2,
-                        to,
-                    }) => {
-                        points.push((from.x, from.y));
-                        points.push((ctrl1.x, ctrl1.y));
-                        points.push((ctrl2.x, ctrl2.y));
-                        points.push((to.x, to.y));
-                    }
-                    svg::PathSegment::ClosePath => {}
-                }
-            }
-        }
-    }
-    let points = Array::from(&points[..]);
-    let window = web_sys::window().unwrap();
-    let document = window.document().unwrap();
-    let canvas = document.get_element_by_id("canvas").unwrap();
-    let canvas: web_sys::HtmlCanvasElement =
-        canvas.dyn_into::<web_sys::HtmlCanvasElement>().unwrap();
-    let context = canvas
-        .get_context("2d")
-        .unwrap()
-        .unwrap()
-        .dyn_into::<CanvasRenderingContext2d>()
-        .unwrap();
-    context.begin_path();
-    context.move_to(
-        points.get_index(0).as_f64().unwrap(),
-        points.get_index(1).as_f64().unwrap(),
-    );
-    for i in 2..points.length() {
-        context.line_to(
-            points.get_index(i).as_f64().unwrap(),
-            points.get_index(i + 1).as_f64().unwrap(),
-        );
-    }
-    context.stroke();
 }
