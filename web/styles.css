@@ -1,16 +1,73 @@
-#flex-container {
+body {
+  font-family: "EB Garamond", serif;
+  font-size: 2em;
+  height: 100vh;
   display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: space-around;
-  align-items: flex-start;
-  width: 600px;
+  justify-content: center;
 }
-#flex-row {
+
+:root {
+  --height: 70vh;
+  --width: calc(var(--width) / 1.618);
+  --border: 0.5px solid #4a4949;
+}
+
+.container {
+  width: var(--width);
+  height: var(--height);
+  border: var(--border);
+  display: grid;
+
+  grid-template-columns: 61.8% 9.02% 5.58% 23.6%;
+  grid-template-rows: 61.8% 9.02% 5.58% 23.6%;
+  grid-template-areas:
+    "A A A A"
+    "B E E D"
+    "B E E D"
+    "B C C C";
+}
+
+.item {
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  align-content: space-around;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  font-size: 1.5em;
+  font-weight: 700;
+  box-sizing: border-box;
+  border: var(--border);
+}
+
+.a {
+  grid-area: A;
+  background-color: #a0ddff;
+}
+.b {
+  grid-area: B;
+  background-color: #c1cefe;
+}
+.c {
+  grid-area: C;
+  background-color: #758ecd;
+}
+.d {
+  grid-area: D;
+  background-color: #7189ff;
+}
+.e {
+  grid-area: E;
+  font-size: 1.2em;
+  background-color: #624cab;
+}
+.f {
+  grid-area: F;
+  font-size: 1em;
+  background-color: #5d2e8c;
+}
+.g {
+  grid-area: G;
+  font-size: 0.7em;
+  background-color: #7a7a7a;
 }

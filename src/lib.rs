@@ -1,5 +1,4 @@
 mod utils;
-use js_sys::Array;
 use num::Complex;
 use std::f64;
 use wasm_bindgen::prelude::*;
@@ -11,7 +10,6 @@ use serde::{Deserialize, Serialize};
 
 use num::complex::Complex64;
 use rustfft::FftPlanner;
-use svg;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -72,7 +70,8 @@ impl Shape {
         self.context.move_to(x, y);
     }
 
-    pub fn end_shape(&mut self) {
+    pub fn end_shape(&mut self, stroke_width: f64) {
+        self.context.set_line_width(stroke_width);
         self.context.close_path();
         self.context.stroke();
         self.started = false;
@@ -82,6 +81,8 @@ impl Shape {
 #[wasm_bindgen]
 pub struct Canvas {
     context: CanvasRenderingContext2d,
+    width: f64,
+    height: f64,
 }
 
 #[wasm_bindgen]
@@ -100,7 +101,20 @@ impl Canvas {
             .dyn_into::<CanvasRenderingContext2d>()
             .unwrap();
 
-        Self { context: context }
+        Self {
+            context: context,
+            width: canvas.width() as f64,
+            height: canvas.height() as f64,
+        }
+    }
+
+    // getters for width and height
+    pub fn width(&self) -> f64 {
+        self.width.clone()
+    }
+
+    pub fn height(&self) -> f64 {
+        self.height.clone()
     }
 
     pub fn line(&self, x1: f64, y1: f64, x2: f64, y2: f64) {
@@ -127,6 +141,15 @@ impl Canvas {
         let width = canvas.width() as f64;
         let height = canvas.height() as f64;
         self.context.clear_rect(0.0, 0.0, width, height);
+        self.context.set_line_width(1.0);
+    }
+
+    pub fn arc(&self, x: f64, y: f64, radius: f64, start_angle: f64, end_angle: f64) {
+        self.context.begin_path();
+        self.context
+            .arc(x, y, radius, start_angle, end_angle)
+            .unwrap();
+        self.context.stroke();
     }
 }
 

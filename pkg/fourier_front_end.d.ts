@@ -19,6 +19,14 @@ export class Canvas {
 */
   constructor(canvas_id: string);
 /**
+* @returns {number}
+*/
+  width(): number;
+/**
+* @returns {number}
+*/
+  height(): number;
+/**
 * @param {number} x1
 * @param {number} y1
 * @param {number} x2
@@ -39,6 +47,14 @@ export class Canvas {
 /**
 */
   clear(): void;
+/**
+* @param {number} x
+* @param {number} y
+* @param {number} radius
+* @param {number} start_angle
+* @param {number} end_angle
+*/
+  arc(x: number, y: number, radius: number, start_angle: number, end_angle: number): void;
 }
 /**
 */
@@ -64,8 +80,9 @@ export class Shape {
 */
   move_to(x: number, y: number): void;
 /**
+* @param {number} stroke_width
 */
-  end_shape(): void;
+  end_shape(stroke_width: number): void;
 }
 /**
 */

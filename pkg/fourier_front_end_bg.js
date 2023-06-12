@@ -268,6 +268,20 @@ export class Canvas {
         return Canvas.__wrap(ret);
     }
     /**
+    * @returns {number}
+    */
+    width() {
+        const ret = wasm.canvas_width(this.__wbg_ptr);
+        return ret;
+    }
+    /**
+    * @returns {number}
+    */
+    height() {
+        const ret = wasm.canvas_height(this.__wbg_ptr);
+        return ret;
+    }
+    /**
     * @param {number} x1
     * @param {number} y1
     * @param {number} x2
@@ -295,6 +309,16 @@ export class Canvas {
     */
     clear() {
         wasm.canvas_clear(this.__wbg_ptr);
+    }
+    /**
+    * @param {number} x
+    * @param {number} y
+    * @param {number} radius
+    * @param {number} start_angle
+    * @param {number} end_angle
+    */
+    arc(x, y, radius, start_angle, end_angle) {
+        wasm.canvas_arc(this.__wbg_ptr, x, y, radius, start_angle, end_angle);
     }
 }
 /**
@@ -351,9 +375,10 @@ export class Shape {
         wasm.shape_move_to(this.__wbg_ptr, x, y);
     }
     /**
+    * @param {number} stroke_width
     */
-    end_shape() {
-        wasm.shape_end_shape(this.__wbg_ptr);
+    end_shape(stroke_width) {
+        wasm.shape_end_shape(this.__wbg_ptr, stroke_width);
     }
 }
 /**
@@ -601,6 +626,10 @@ export function __wbg_instanceof_CanvasRenderingContext2d_ad94e23ca309f82e(arg0)
 export function __wbg_canvas_3161811f4ae31dc8(arg0) {
     const ret = getObject(arg0).canvas;
     return isLikeNone(ret) ? 0 : addHeapObject(ret);
+};
+
+export function __wbg_setlineWidth_b1749d46786b7fb3(arg0, arg1) {
+    getObject(arg0).lineWidth = arg1;
 };
 
 export function __wbg_beginPath_d62a25661c041610(arg0) {

@@ -9,5 +9,11 @@ import("./dft_complex.js").catch((e) =>
   console.error("Error importing `dft_complex.js`:", e)
 );
 import("./dft_svg.js").catch((e) =>
-  console.error("Error importing `dft_complex.js`:", e)
+  console.error("Error importing `dft_svg.js`:", e)
+);
+import("./dft_logo.js").catch((e) =>
+  console.error("Error importing `dft_logo.js`:", e)
+);
+import("./dft_iain.js").catch((e) =>
+  console.error("Error importing `dft_iain.js`:", e)
 );
