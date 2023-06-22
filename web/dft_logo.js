@@ -62,9 +62,7 @@ let centerY = canvas.height() / 2;
 
 // This will "decompose" our input signal into its constituent waves.
 let d = compute_spectrum_js({
-  sig: avatar.filter((val, ix) => {
-    return ix % 2 === 0;
-  }),
+  sig: avatar,
 });
 let fourier = genFourier(d);
 
