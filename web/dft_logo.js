@@ -41,9 +41,6 @@ function genFourier(d) {
   const phases = d.phase();
   const frequencies = d.frequency();
 
-  console.log("freq:", frequencies);
-  console.log("phase:", phases);
-
   d.real().map((re, ix) => {
     fourier.push({
       re: re,
@@ -54,7 +51,6 @@ function genFourier(d) {
     });
   });
   fourier = fourier.sort((a, b) => b.amp - a.amp);
-  console.log("fourier", fourier);
   return fourier;
 }
 
@@ -68,12 +64,26 @@ let centerY = canvas.height() / 2;
 let d = compute_spectrum_js({
   sig: avatar,
 });
-console.log(d);
 let fourier = genFourier(d);
 
 const maxPathLength = fourier.length;
 
-function step() {
+let lastFrameTime = null;
+let speedFactor = 2; // increase this to slow down the animation
+
+function step(currentFrameTime) {
+  // skip this frame if not enough time has passed since last frame
+  // this has the effect of sloing down the animation.
+  if (
+    lastFrameTime !== null &&
+    currentFrameTime - lastFrameTime < (1000 / 80) * speedFactor
+  ) {
+    window.requestAnimationFrame(step);
+    return;
+  }
+  // save the timestamp of this frame
+  lastFrameTime = currentFrameTime;
+
   let draw = true;
   canvas.clear();
 
@@ -115,9 +125,8 @@ function step() {
   shape.end_shape(1);
 
   const dt = (2 * Math.PI) / fourier.length;
-  time += dt;
-  //canvas.pan_to(vx[0], vx[1]);
 
+  time += dt;
   window.requestAnimationFrame(step);
 }
 
