@@ -41,6 +41,11 @@ export class Canvas {
 /**
 * @param {number} x
 * @param {number} y
+*/
+  pan_to(x: number, y: number): void;
+/**
+* @param {number} x
+* @param {number} y
 * @param {number} radius
 */
   circle(x: number, y: number, radius: number): void;

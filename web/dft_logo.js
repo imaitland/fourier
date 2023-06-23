@@ -41,6 +41,9 @@ function genFourier(d) {
   const phases = d.phase();
   const frequencies = d.frequency();
 
+  console.log("freq:", frequencies);
+  console.log("phase:", phases);
+
   d.real().map((re, ix) => {
     fourier.push({
       re: re,
@@ -51,6 +54,7 @@ function genFourier(d) {
     });
   });
   fourier = fourier.sort((a, b) => b.amp - a.amp);
+  console.log("fourier", fourier);
   return fourier;
 }
 
@@ -64,6 +68,7 @@ let centerY = canvas.height() / 2;
 let d = compute_spectrum_js({
   sig: avatar,
 });
+console.log(d);
 let fourier = genFourier(d);
 
 const maxPathLength = fourier.length;
@@ -111,6 +116,8 @@ function step() {
 
   const dt = (2 * Math.PI) / fourier.length;
   time += dt;
+  //canvas.pan_to(vx[0], vx[1]);
+
   window.requestAnimationFrame(step);
 }
 

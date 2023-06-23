@@ -128,6 +128,14 @@ impl Canvas {
         self.context.move_to(x, y);
     }
 
+    // method to pan canvas to center x y coords
+    pub fn pan_to(&self, x: f64, y: f64) {
+        let width = self.width() as f64;
+        let height = self.height() as f64;
+        self.context.translate(width / 2.0, height / 2.0).unwrap();
+        self.context.translate(x, y).unwrap();
+    }
+
     pub fn circle(&self, x: f64, y: f64, radius: f64) {
         self.context.begin_path();
         self.context
@@ -141,7 +149,6 @@ impl Canvas {
         let width = canvas.width() as f64;
         let height = canvas.height() as f64;
         self.context.clear_rect(0.0, 0.0, width, height);
-        self.context.set_line_width(1.0);
     }
 
     pub fn arc(&self, x: f64, y: f64, radius: f64, start_angle: f64, end_angle: f64) {

@@ -13,6 +13,7 @@ export function canvas_width(a: number): number;
 export function canvas_height(a: number): number;
 export function canvas_line(a: number, b: number, c: number, d: number, e: number): void;
 export function canvas_move_to(a: number, b: number, c: number): void;
+export function canvas_pan_to(a: number, b: number, c: number): void;
 export function canvas_circle(a: number, b: number, c: number, d: number): void;
 export function canvas_clear(a: number): void;
 export function canvas_arc(a: number, b: number, c: number, d: number, e: number, f: number): void;
