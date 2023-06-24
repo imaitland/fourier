@@ -29,7 +29,6 @@ body {
   height: var(--height);
   border: var(--border);
   display: grid;
-
   grid-template-rows: 61.8% 9.02% 5.58% 23.6%;
   grid-template-columns: 61.8% 9.02% 5.58% 23.6%;
   grid-template-areas:
@@ -53,6 +52,7 @@ body {
 .a {
   grid-area: A;
   background-color: #f3f0ee;
+  overflow: hidden;
 }
 .b {
   grid-area: B;

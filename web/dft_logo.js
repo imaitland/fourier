@@ -5,6 +5,10 @@ import { avatar } from "./avatar.js";
 let time = 0;
 let path = [];
 
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
 function epicycles(x, y, rotation, fourier, draw = true) {
   // For each epicycle in the fourier series, we will draw a circle.
   for (let i = 0; i < fourier.length; i++) {
@@ -20,12 +24,6 @@ function epicycles(x, y, rotation, fourier, draw = true) {
     y += radius * Math.sin(freq * time + phase + rotation);
 
     if (draw) {
-      if (i > 30) {
-        if (i % 2 === 0 || i % 5 === 0) {
-          break;
-        }
-        continue;
-      }
       // Circle
       canvas.circle(prev_x, prev_y, radius);
 
@@ -74,13 +72,29 @@ let d = compute_spectrum_js({
 });
 let fourier = genFourier(d);
 
-const maxPathLength = fourier.length;
+const maxPathLength = fourier.length - 5;
 
 let lastFrameTime = null;
 let speedFactor = 2; // increase this to slow down the animation
-let scaleFactor = 5; // increase this to zoom in on the animation
+let scaleFactor = 190; // increase this to zoom in on the animation
+let startingScale = 190;
+let translate = true; // decrease this to move the animation around less
 
 function step(currentFrameTime) {
+  if (scaleFactor > 1.00005) {
+    // as scaleFactor approaches 1 reduce the scale factor by less than 1 logarithmic
+    scaleFactor -= Math.log(scaleFactor) / 20;
+
+    // Compute speedFactor as a linear interpolation between 1 and 4 based on scaleFactor
+    if (scaleFactor <= startingScale) {
+      let factor = (startingScale - scaleFactor) / (startingScale - 1);
+      speedFactor = 1 + factor * (2 - 1);
+    }
+  } else {
+    scaleFactor = 1;
+    translate = false;
+  }
+
   // skip this frame if not enough time has passed since last frame
   // this has the effect of sloing down the animation.
   if (
@@ -103,10 +117,16 @@ function step(currentFrameTime) {
   let vx = epicycles(x, y, 0, fourier, false);
 
   // Zoom in on the xy coords of the last epicycle
-  canvas.translate(
-    canvas.width() / 2.0 - vx[0] * scaleFactor,
-    canvas.height() / 2.0 - vx[1] * scaleFactor
-  );
+  const xTranslation = vx[0] * scaleFactor;
+  const yTranslation = vx[1] * scaleFactor;
+
+  let dx = centerX - xTranslation;
+  let dy = centerY - yTranslation;
+
+  if (translate) {
+    canvas.translate(dx, dy);
+  }
+
   canvas.scale(scaleFactor, scaleFactor);
   canvas.set_line_width(1.0 / scaleFactor);
 
@@ -120,7 +140,7 @@ function step(currentFrameTime) {
   // add to beginning.
   path.unshift(vx);
 
-  if (path.length === maxPathLength + 5) {
+  if (path.length === maxPathLength) {
     // remove from end
     path.pop();
   }
@@ -130,6 +150,7 @@ function step(currentFrameTime) {
   let offset = 0;
 
   shape.begin_shape(center_x, center_y);
+  canvas.set_line_width(1.0 / (scaleFactor * 0.5));
 
   for (let i = 0; i < path.length; i++) {
     // check if subsequent points are nearby on the x axis, if they are far apart, move the pen to the new point without drawing it.
@@ -148,12 +169,11 @@ function step(currentFrameTime) {
 
   time += dt;
 
-  // Restore zoom and translation
+  // Restore zoom
   canvas.scale(1.0 / scaleFactor, 1.0 / scaleFactor);
-  canvas.translate(
-    -(canvas.width() / 2.0 - vx[0] * scaleFactor),
-    -(canvas.height() / 2.0 - vx[1] * scaleFactor)
-  );
+
+  // Restore translation
+  translate && canvas.translate(-dx, -dy);
   canvas.set_line_width(1.0 / scaleFactor);
 
   window.requestAnimationFrame(step);
