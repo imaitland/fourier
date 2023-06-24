@@ -300,13 +300,6 @@ export class Canvas {
     /**
     * @param {number} x
     * @param {number} y
-    */
-    pan_to(x, y) {
-        wasm.canvas_pan_to(this.__wbg_ptr, x, y);
-    }
-    /**
-    * @param {number} x
-    * @param {number} y
     * @param {number} radius
     */
     circle(x, y, radius) {
@@ -326,6 +319,26 @@ export class Canvas {
     */
     arc(x, y, radius, start_angle, end_angle) {
         wasm.canvas_arc(this.__wbg_ptr, x, y, radius, start_angle, end_angle);
+    }
+    /**
+    * @param {number} x
+    * @param {number} y
+    */
+    translate(x, y) {
+        wasm.canvas_translate(this.__wbg_ptr, x, y);
+    }
+    /**
+    * @param {number} x
+    * @param {number} y
+    */
+    scale(x, y) {
+        wasm.canvas_scale(this.__wbg_ptr, x, y);
+    }
+    /**
+    * @param {number} width
+    */
+    set_line_width(width) {
+        wasm.canvas_set_line_width(this.__wbg_ptr, width);
     }
 }
 /**
@@ -382,10 +395,15 @@ export class Shape {
         wasm.shape_move_to(this.__wbg_ptr, x, y);
     }
     /**
-    * @param {number} stroke_width
     */
-    end_shape(stroke_width) {
-        wasm.shape_end_shape(this.__wbg_ptr, stroke_width);
+    end_shape() {
+        wasm.shape_end_shape(this.__wbg_ptr);
+    }
+    /**
+    * @param {number} width
+    */
+    set_line_width(width) {
+        wasm.shape_set_line_width(this.__wbg_ptr, width);
     }
 }
 /**
@@ -671,6 +689,10 @@ export function __wbg_moveTo_6451fcc8e9c4ea8d(arg0, arg1, arg2) {
 export function __wbg_clearRect_dc28576f7865a790(arg0, arg1, arg2, arg3, arg4) {
     getObject(arg0).clearRect(arg1, arg2, arg3, arg4);
 };
+
+export function __wbg_scale_abdedddad54137e7() { return handleError(function (arg0, arg1, arg2) {
+    getObject(arg0).scale(arg1, arg2);
+}, arguments) };
 
 export function __wbg_translate_46f9dc9494bf9350() { return handleError(function (arg0, arg1, arg2) {
     getObject(arg0).translate(arg1, arg2);

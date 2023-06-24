@@ -5,7 +5,7 @@ import { avatar } from "./avatar.js";
 let time = 0;
 let path = [];
 
-function epicycles(x, y, rotation, fourier) {
+function epicycles(x, y, rotation, fourier, draw = true) {
   // For each epicycle in the fourier series, we will draw a circle.
   for (let i = 0; i < fourier.length; i++) {
     let prev_x = x;
@@ -19,14 +19,22 @@ function epicycles(x, y, rotation, fourier) {
     x += radius * Math.cos(freq * time + phase + rotation);
     y += radius * Math.sin(freq * time + phase + rotation);
 
-    // Circle
-    canvas.circle(prev_x, prev_y, radius);
+    if (draw) {
+      if (i > 30) {
+        if (i % 2 === 0 || i % 5 === 0) {
+          break;
+        }
+        continue;
+      }
+      // Circle
+      canvas.circle(prev_x, prev_y, radius);
 
-    // Perimeter point
-    canvas.circle(x, y, 1);
+      // Perimeter point
+      canvas.circle(x, y, 1);
 
-    // Line from circle center to it perimeter.
-    canvas.line(prev_x, prev_y, x, y);
+      // Line from circle center to it perimeter.
+      canvas.line(prev_x, prev_y, x, y);
+    }
   }
   // Return the last x and y point from that epicycle sequence.
   // We'll use this to draw a line from the end of the last epicycle to the path.
@@ -70,13 +78,14 @@ const maxPathLength = fourier.length;
 
 let lastFrameTime = null;
 let speedFactor = 2; // increase this to slow down the animation
+let scaleFactor = 5; // increase this to zoom in on the animation
 
 function step(currentFrameTime) {
   // skip this frame if not enough time has passed since last frame
   // this has the effect of sloing down the animation.
   if (
     lastFrameTime !== null &&
-    currentFrameTime - lastFrameTime < (1000 / 80) * speedFactor
+    currentFrameTime - lastFrameTime < (1000 / 60) * speedFactor
   ) {
     window.requestAnimationFrame(step);
     return;
@@ -84,7 +93,6 @@ function step(currentFrameTime) {
   // save the timestamp of this frame
   lastFrameTime = currentFrameTime;
 
-  let draw = true;
   canvas.clear();
 
   // calculate middle of the canvas...
@@ -92,7 +100,18 @@ function step(currentFrameTime) {
   let y = centerY;
 
   // Epicycles returns the last point in that sequence of epicycles.
-  let vx = epicycles(x, y, 0, fourier);
+  let vx = epicycles(x, y, 0, fourier, false);
+
+  // Zoom in on the xy coords of the last epicycle
+  canvas.translate(
+    canvas.width() / 2.0 - vx[0] * scaleFactor,
+    canvas.height() / 2.0 - vx[1] * scaleFactor
+  );
+  canvas.scale(scaleFactor, scaleFactor);
+  canvas.set_line_width(1.0 / scaleFactor);
+
+  // Draw the epicycles this time
+  epicycles(x, y, 0, fourier, true);
 
   // Draw the wave.
   const center_x = 100;
@@ -107,6 +126,7 @@ function step(currentFrameTime) {
   }
 
   let shape = new Shape("dft_logo_canvas");
+  shape.set_line_width(1.0 / scaleFactor);
   let offset = 0;
 
   shape.begin_shape(center_x, center_y);
@@ -122,11 +142,20 @@ function step(currentFrameTime) {
     }
   }
 
-  shape.end_shape(1);
+  shape.end_shape();
 
   const dt = (2 * Math.PI) / fourier.length;
 
   time += dt;
+
+  // Restore zoom and translation
+  canvas.scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+  canvas.translate(
+    -(canvas.width() / 2.0 - vx[0] * scaleFactor),
+    -(canvas.height() / 2.0 - vx[1] * scaleFactor)
+  );
+  canvas.set_line_width(1.0 / scaleFactor);
+
   window.requestAnimationFrame(step);
 }
 

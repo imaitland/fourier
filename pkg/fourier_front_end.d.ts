@@ -41,11 +41,6 @@ export class Canvas {
 /**
 * @param {number} x
 * @param {number} y
-*/
-  pan_to(x: number, y: number): void;
-/**
-* @param {number} x
-* @param {number} y
 * @param {number} radius
 */
   circle(x: number, y: number, radius: number): void;
@@ -60,6 +55,20 @@ export class Canvas {
 * @param {number} end_angle
 */
   arc(x: number, y: number, radius: number, start_angle: number, end_angle: number): void;
+/**
+* @param {number} x
+* @param {number} y
+*/
+  translate(x: number, y: number): void;
+/**
+* @param {number} x
+* @param {number} y
+*/
+  scale(x: number, y: number): void;
+/**
+* @param {number} width
+*/
+  set_line_width(width: number): void;
 }
 /**
 */
@@ -85,9 +94,12 @@ export class Shape {
 */
   move_to(x: number, y: number): void;
 /**
-* @param {number} stroke_width
 */
-  end_shape(stroke_width: number): void;
+  end_shape(): void;
+/**
+* @param {number} width
+*/
+  set_line_width(width: number): void;
 }
 /**
 */

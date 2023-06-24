@@ -70,11 +70,13 @@ impl Shape {
         self.context.move_to(x, y);
     }
 
-    pub fn end_shape(&mut self, stroke_width: f64) {
-        self.context.set_line_width(stroke_width);
+    pub fn end_shape(&mut self) {
         self.context.close_path();
         self.context.stroke();
         self.started = false;
+    }
+    pub fn set_line_width(&self, width: f64) {
+        self.context.set_line_width(width);
     }
 }
 
@@ -128,14 +130,6 @@ impl Canvas {
         self.context.move_to(x, y);
     }
 
-    // method to pan canvas to center x y coords
-    pub fn pan_to(&self, x: f64, y: f64) {
-        let width = self.width() as f64;
-        let height = self.height() as f64;
-        self.context.translate(width / 2.0, height / 2.0).unwrap();
-        self.context.translate(x, y).unwrap();
-    }
-
     pub fn circle(&self, x: f64, y: f64, radius: f64) {
         self.context.begin_path();
         self.context
@@ -157,6 +151,17 @@ impl Canvas {
             .arc(x, y, radius, start_angle, end_angle)
             .unwrap();
         self.context.stroke();
+    }
+
+    pub fn translate(&self, x: f64, y: f64) {
+        self.context.translate(x, y).unwrap();
+    }
+
+    pub fn scale(&self, x: f64, y: f64) {
+        self.context.scale(x, y).unwrap();
+    }
+    pub fn set_line_width(&self, width: f64) {
+        self.context.set_line_width(width);
     }
 }
 
