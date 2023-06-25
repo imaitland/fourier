@@ -76,23 +76,26 @@ const maxPathLength = fourier.length - 5;
 
 let lastFrameTime = null;
 let speedFactor = 2; // increase this to slow down the animation
-let scaleFactor = 190; // increase this to zoom in on the animation
-let startingScale = 190;
+let scale = 60; // increase this to zoom in on the animation
+let startingScale = 60;
 let translate = true; // decrease this to move the animation around less
 
-function step(currentFrameTime) {
-  if (scaleFactor > 1.00005) {
-    // as scaleFactor approaches 1 reduce the scale factor by less than 1 logarithmic
-    scaleFactor -= Math.log(scaleFactor) / 20;
+let fx = 1;
+let factor = 0;
 
-    // Compute speedFactor as a linear interpolation between 1 and 4 based on scaleFactor
-    if (scaleFactor <= startingScale) {
-      let factor = (startingScale - scaleFactor) / (startingScale - 1);
+function step(currentFrameTime) {
+  if (scale > 1.00005) {
+    // as scale approaches 1 reduce the scale factor by less than 1 logarithmic
+    scale -= Math.log(scale) / 20;
+
+    // Compute speedFactor as a linear interpolation between 1 and 4 based on scale
+    if (scale <= startingScale) {
+      factor = (startingScale - scale) / (startingScale - 1);
       speedFactor = 1 + factor * (2 - 1);
+      fx = 1 - factor;
     }
   } else {
-    scaleFactor = 1;
-    translate = false;
+    scale = 1;
   }
 
   // skip this frame if not enough time has passed since last frame
@@ -117,18 +120,24 @@ function step(currentFrameTime) {
   let vx = epicycles(x, y, 0, fourier, false);
 
   // Zoom in on the xy coords of the last epicycle
-  const xTranslation = vx[0] * scaleFactor;
-  const yTranslation = vx[1] * scaleFactor;
+  //const xTranslation = vx[0] * scale * fx * factor + centerX * factor;
+  //const yTranslation = vx[1] * scale * fx * factor + centerY * factor;
+
+  let xTranslation = vx[0] * scale;
+  let yTranslation = vx[1] * scale;
+
+  if (fx < 0.0006) {
+    xTranslation = vx[0] * scale * fx + centerX;
+    yTranslation = vx[1] * scale * fx + centerY;
+  }
 
   let dx = centerX - xTranslation;
   let dy = centerY - yTranslation;
 
-  if (translate) {
-    canvas.translate(dx, dy);
-  }
+  canvas.translate(dx, dy);
 
-  canvas.scale(scaleFactor, scaleFactor);
-  canvas.set_line_width(1.0 / scaleFactor);
+  canvas.scale(scale, scale);
+  canvas.set_line_width(1.0 / scale);
 
   // Draw the epicycles this time
   epicycles(x, y, 0, fourier, true);
@@ -146,11 +155,11 @@ function step(currentFrameTime) {
   }
 
   let shape = new Shape("dft_logo_canvas");
-  shape.set_line_width(1.0 / scaleFactor);
+  shape.set_line_width(1.0 / scale);
   let offset = 0;
 
   shape.begin_shape(center_x, center_y);
-  canvas.set_line_width(1.0 / (scaleFactor * 0.5));
+  canvas.set_line_width(1.0 / (scale * 0.5));
 
   for (let i = 0; i < path.length; i++) {
     // check if subsequent points are nearby on the x axis, if they are far apart, move the pen to the new point without drawing it.
@@ -170,11 +179,11 @@ function step(currentFrameTime) {
   time += dt;
 
   // Restore zoom
-  canvas.scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+  canvas.scale(1.0 / scale, 1.0 / scale);
 
   // Restore translation
-  translate && canvas.translate(-dx, -dy);
-  canvas.set_line_width(1.0 / scaleFactor);
+  canvas.translate(-dx, -dy);
+  canvas.set_line_width(1.0 / scale);
 
   window.requestAnimationFrame(step);
 }
