@@ -76,12 +76,9 @@ const maxPathLength = fourier.length - 5;
 
 let lastFrameTime = null;
 let speedFactor = 2; // increase this to slow down the animation
-let scale = 60; // increase this to zoom in on the animation
-let startingScale = 60;
-let translate = true; // decrease this to move the animation around less
-
-let fx = 1;
-let factor = 0;
+let scale = 1; // increase this to zoom in on the animation
+let startingScale = 1;
+let track = false; // true will follow drawing motion
 
 function step(currentFrameTime) {
   if (scale > 1.00005) {
@@ -90,9 +87,8 @@ function step(currentFrameTime) {
 
     // Compute speedFactor as a linear interpolation between 1 and 4 based on scale
     if (scale <= startingScale) {
-      factor = (startingScale - scale) / (startingScale - 1);
-      speedFactor = 1 + factor * (2 - 1);
-      fx = 1 - factor;
+      let factor = (startingScale - scale) / (startingScale - 1);
+      speedFactor = 1 + factor * (startingScale - 1);
     }
   } else {
     scale = 1;
@@ -120,21 +116,15 @@ function step(currentFrameTime) {
   let vx = epicycles(x, y, 0, fourier, false);
 
   // Zoom in on the xy coords of the last epicycle
-  //const xTranslation = vx[0] * scale * fx * factor + centerX * factor;
-  //const yTranslation = vx[1] * scale * fx * factor + centerY * factor;
+  if (track) {
+    let xTranslation = vx[0] * scale;
+    let yTranslation = vx[1] * scale;
 
-  let xTranslation = vx[0] * scale;
-  let yTranslation = vx[1] * scale;
+    let dx = centerX - xTranslation;
+    let dy = centerY - yTranslation;
 
-  if (fx < 0.0006) {
-    xTranslation = vx[0] * scale * fx + centerX;
-    yTranslation = vx[1] * scale * fx + centerY;
+    canvas.translate(dx, dy);
   }
-
-  let dx = centerX - xTranslation;
-  let dy = centerY - yTranslation;
-
-  canvas.translate(dx, dy);
 
   canvas.scale(scale, scale);
   canvas.set_line_width(1.0 / scale);
@@ -182,7 +172,7 @@ function step(currentFrameTime) {
   canvas.scale(1.0 / scale, 1.0 / scale);
 
   // Restore translation
-  canvas.translate(-dx, -dy);
+  track && canvas.translate(-dx, -dy);
   canvas.set_line_width(1.0 / scale);
 
   window.requestAnimationFrame(step);

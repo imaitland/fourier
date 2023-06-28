@@ -12,6 +12,7 @@ body {
   --height: 75vh;
   --width: calc(75vh / 1.618);
   --border: 0.5px dashed #000;
+  --border-radius: 10px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,6 +48,7 @@ body {
   font-size: 1.5em;
   box-sizing: border-box;
   border: var(--border);
+  border-radius: var(--border-radius);
 }
 
 .a {
