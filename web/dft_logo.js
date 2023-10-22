@@ -1,5 +1,5 @@
 import { Shape, Canvas, compute_spectrum_js } from "fourier-front-end";
-import { avatar } from "./avatar.js";
+import { avatar, offsetAvatar } from "./avatar.js";
 
 let DARKMODE = false;
 if (
@@ -78,30 +78,35 @@ let centerY = canvas.height() / 2 - 10;
 
 // This will "decompose" our input signal into its constituent waves.
 let d = compute_spectrum_js({
-  sig: avatar,
+  sig: offsetAvatar(80),
 });
 let fourier = genFourier(d);
 
 const maxPathLength = fourier.length - 5;
 
 let lastFrameTime = null;
-let speedFactor = 2; // increase this to slow down the animation
-let scale = 1; // increase this to zoom in on the animation
-let startingScale = 1;
-let track = false; // true will follow drawing motion
+let speedFactor = 4; // increase this to slow down the animation
+let scale = 40; // increase this to zoom in on the animation
+let startingScale = 2;
+let track = true; // true will follow drawing motion
+let minDistance = Infinity;
+let closestPointVx = null;
+
+// loop thru all points, find the closes.
 
 function step(currentFrameTime) {
-  if (scale > 1.00005) {
+  // Zoom Out
+  if (scale > startingScale + 0.0001) {
     // as scale approaches 1 reduce the scale factor by less than 1 logarithmic
-    scale -= Math.log(scale) / 20;
+    scale -= Math.log(scale) / 100;
 
     // Compute speedFactor as a linear interpolation between 1 and 4 based on scale
     if (scale <= startingScale) {
-      let factor = (startingScale - scale) / (startingScale - 1);
+      let factor = (startingScale - scale) / startingScale;
       speedFactor = 1 + factor * (startingScale - 1);
     }
   } else {
-    scale = 1;
+    scale = startingScale;
   }
 
   // skip this frame if not enough time has passed since last frame
@@ -126,16 +131,40 @@ function step(currentFrameTime) {
   let vx = epicycles(x, y, 0, fourier, false);
 
   // Zoom in on the xy coords of the last epicycle
-  if (track) {
-    let xTranslation = vx[0] * scale;
-    let yTranslation = vx[1] * scale;
+  let xTranslation = vx[0] * scale;
+  let yTranslation = vx[1] * scale;
 
-    let dx = centerX - xTranslation;
-    let dy = centerY - yTranslation;
+  let dx = centerX - xTranslation;
+  let dy = centerY - yTranslation;
 
-    canvas.translate(dx, dy);
+  const distance = Math.hypot(centerX - vx[0], centerY - vx[1]);
+
+  if (distance < minDistance) {
+    minDistance = distance;
+    // record closest point. later must calculate scale with it.
+    // record deltas of closest point
+    closestPointVx = vx;
   }
 
+  // We know we have the closest point for the loop
+  if (path.length === maxPathLength - 1) {
+    // At the closest point again
+    if (closestPointVx === vx) {
+      // stop tracking
+      track = false;
+    }
+  }
+
+  // now that tracking is false we use a different delta.
+  if (!track && scale === startingScale) {
+    // Zoom in will remain constant now
+    xTranslation = closestPointVx[0] * scale;
+    yTranslation = closestPointVx[1] * scale;
+    dx = centerX - xTranslation;
+    dy = centerY - yTranslation;
+  }
+
+  canvas.translate(dx, dy);
   canvas.scale(scale, scale);
   canvas.set_line_width(1.0 / scale);
 
@@ -161,8 +190,7 @@ function step(currentFrameTime) {
   shape.begin_shape(center_x, center_y);
   shape.set_stroke_style(colors.face);
 
-  canvas.set_line_width(1.0 / (scale * 0.5));
-  //canvas.set_line_width(10);
+  canvas.set_line_width(2.2 / (scale * 0.5));
 
   for (let i = 0; i < path.length; i++) {
     // check if subsequent points are nearby on the x axis, if they are far apart, move the pen to the new point without drawing it.
@@ -185,7 +213,7 @@ function step(currentFrameTime) {
   canvas.scale(1.0 / scale, 1.0 / scale);
 
   // Restore translation
-  track && canvas.translate(-dx, -dy);
+  canvas.translate(-dx, -dy);
   canvas.set_line_width(1.0 / scale);
   // Restore line color
   shape.set_stroke_style(colors.epicycles);

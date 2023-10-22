@@ -3161,6 +3161,16 @@ const raw = Array.from(data3.matchAll(regex), (m) => [
 //export const avatar = raw.sort((a, b) => a[0] - b[0]);
 // offset all y coords in raw by 100 up
 export const avatar = raw.map((p) => [p[0] - 1000, p[1] - 1000]);
+
+export const offsetAvatar = (offset) => {
+  let av = [...avatar];
+  let init = 0;
+  while (init < offset) {
+    av.push(av.shift());
+    init++;
+  }
+  return av;
+};
 //export const avatar = raw;
 
 const raw_iain = Array.from(logo_data.matchAll(regex), (m) => [
