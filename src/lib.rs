@@ -78,6 +78,9 @@ impl Shape {
     pub fn set_line_width(&self, width: f64) {
         self.context.set_line_width(width);
     }
+    pub fn set_stroke_style(&self, value: JsValue) {
+        self.context.set_stroke_style(&value)
+    }
 }
 
 #[wasm_bindgen]

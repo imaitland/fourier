@@ -1,3 +1,9 @@
+```
+npm run build
+npm run start
+```
+
+
 <div align="center">
 
   <h1><code>create-wasm-app</code></h1>

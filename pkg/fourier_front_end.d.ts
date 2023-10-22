@@ -100,6 +100,10 @@ export class Shape {
 * @param {number} width
 */
   set_line_width(width: number): void;
+/**
+* @param {any} value
+*/
+  set_stroke_style(value: any): void;
 }
 /**
 */

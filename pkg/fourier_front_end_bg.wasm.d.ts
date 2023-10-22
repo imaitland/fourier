@@ -8,6 +8,7 @@ export function shape_vertex(a: number, b: number, c: number): void;
 export function shape_move_to(a: number, b: number, c: number): void;
 export function shape_end_shape(a: number): void;
 export function shape_set_line_width(a: number, b: number): void;
+export function shape_set_stroke_style(a: number, b: number): void;
 export function __wbg_canvas_free(a: number): void;
 export function canvas_new(a: number, b: number): number;
 export function canvas_width(a: number): number;

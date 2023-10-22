@@ -70,6 +70,9 @@
 /******/ 					"__wbindgen_is_object": function(p0i32) {
 /******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbindgen_is_object"](p0i32);
 /******/ 					},
+/******/ 					"__wbindgen_string_new": function(p0i32,p1i32) {
+/******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbindgen_string_new"](p0i32,p1i32);
+/******/ 					},
 /******/ 					"__wbindgen_jsval_loose_eq": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbindgen_jsval_loose_eq"](p0i32,p1i32);
 /******/ 					},
@@ -112,6 +115,12 @@
 /******/ 					"__wbg_canvas_3161811f4ae31dc8": function(p0i32) {
 /******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_canvas_3161811f4ae31dc8"](p0i32);
 /******/ 					},
+/******/ 					"__wbg_setstrokeStyle_b7f2ba53250c124b": function(p0i32,p1i32) {
+/******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_setstrokeStyle_b7f2ba53250c124b"](p0i32,p1i32);
+/******/ 					},
+/******/ 					"__wbg_setlineWidth_b1749d46786b7fb3": function(p0i32,p1f64) {
+/******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_setlineWidth_b1749d46786b7fb3"](p0i32,p1f64);
+/******/ 					},
 /******/ 					"__wbg_beginPath_d62a25661c041610": function(p0i32) {
 /******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_beginPath_d62a25661c041610"](p0i32);
 /******/ 					},
@@ -132,6 +141,12 @@
 /******/ 					},
 /******/ 					"__wbg_clearRect_dc28576f7865a790": function(p0i32,p1f64,p2f64,p3f64,p4f64) {
 /******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_clearRect_dc28576f7865a790"](p0i32,p1f64,p2f64,p3f64,p4f64);
+/******/ 					},
+/******/ 					"__wbg_scale_abdedddad54137e7": function(p0i32,p1f64,p2f64) {
+/******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_scale_abdedddad54137e7"](p0i32,p1f64,p2f64);
+/******/ 					},
+/******/ 					"__wbg_translate_46f9dc9494bf9350": function(p0i32,p1f64,p2f64) {
+/******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_translate_46f9dc9494bf9350"](p0i32,p1f64,p2f64);
 /******/ 					},
 /******/ 					"__wbg_getElementById_2d1ad15c49298068": function(p0i32,p1i32,p2i32) {
 /******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_getElementById_2d1ad15c49298068"](p0i32,p1i32,p2i32);
@@ -168,9 +183,6 @@
 /******/ 					},
 /******/ 					"__wbg_call_557a2f2deacc4912": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_call_557a2f2deacc4912"](p0i32,p1i32);
-/******/ 					},
-/******/ 					"__wbindgen_string_new": function(p0i32,p1i32) {
-/******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbindgen_string_new"](p0i32,p1i32);
 /******/ 					},
 /******/ 					"__wbg_self_742dd6eab3e9211e": function() {
 /******/ 						return installedModules["../pkg/fourier_front_end_bg.js"].exports["__wbg_self_742dd6eab3e9211e"]();
@@ -315,7 +327,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/fourier_front_end_bg.wasm":"1bf3c62c584f5100e213"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/fourier_front_end_bg.wasm":"149859dcbb0f5fc8db68"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
@@ -416,7 +428,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("// A dependency graph that contains any wasm must all be imported\n// asynchronously. This `bootstrap.js` file does the single async import, so\n// that no one else needs to worry about it again.\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(5)]).then(__webpack_require__.bind(null, /*! ./index.js */ \"./index.js\")).catch((e) =>\n  console.error(\"Error importing `index.js`:\", e)\n);\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(4)]).then(__webpack_require__.bind(null, /*! ./dft.js */ \"./dft.js\")).catch((e) => console.error(\"Error importing `dft.js`:\", e));\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(3)]).then(__webpack_require__.bind(null, /*! ./dft_complex.js */ \"./dft_complex.js\")).catch((e) =>\n  console.error(\"Error importing `dft_complex.js`:\", e)\n);\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2)]).then(__webpack_require__.bind(null, /*! ./dft_svg.js */ \"./dft_svg.js\")).catch((e) =>\n  console.error(\"Error importing `dft_complex.js`:\", e)\n);\n\n\n//# sourceURL=webpack:///./bootstrap.js?");
+eval("// A dependency graph that contains any wasm must all be imported\n// asynchronously. This `bootstrap.js` file does the single async import, so\n// that no one else needs to worry about it again.\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(8)]).then(__webpack_require__.bind(null, /*! ./index.js */ \"./index.js\")).catch((e) =>\n  console.error(\"Error importing `index.js`:\", e)\n);\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(4)]).then(__webpack_require__.bind(null, /*! ./dft.js */ \"./dft.js\")).catch((e) => console.error(\"Error importing `dft.js`:\", e));\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(2), __webpack_require__.e(3)]).then(__webpack_require__.bind(null, /*! ./dft_complex.js */ \"./dft_complex.js\")).catch((e) =>\n  console.error(\"Error importing `dft_complex.js`:\", e)\n);\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(7)]).then(__webpack_require__.bind(null, /*! ./dft_svg.js */ \"./dft_svg.js\")).catch((e) =>\n  console.error(\"Error importing `dft_svg.js`:\", e)\n);\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(6)]).then(__webpack_require__.bind(null, /*! ./dft_logo.js */ \"./dft_logo.js\")).catch((e) =>\n  console.error(\"Error importing `dft_logo.js`:\", e)\n);\nPromise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(5)]).then(__webpack_require__.bind(null, /*! ./dft_iain.js */ \"./dft_iain.js\")).catch((e) =>\n  console.error(\"Error importing `dft_iain.js`:\", e)\n);\n\n\n//# sourceURL=webpack:///./bootstrap.js?");
 
 /***/ })
 

@@ -405,6 +405,12 @@ export class Shape {
     set_line_width(width) {
         wasm.shape_set_line_width(this.__wbg_ptr, width);
     }
+    /**
+    * @param {any} value
+    */
+    set_stroke_style(value) {
+        wasm.shape_set_stroke_style(this.__wbg_ptr, addHeapObject(value));
+    }
 }
 /**
 */
@@ -656,6 +662,10 @@ export function __wbg_instanceof_CanvasRenderingContext2d_ad94e23ca309f82e(arg0)
 export function __wbg_canvas_3161811f4ae31dc8(arg0) {
     const ret = getObject(arg0).canvas;
     return isLikeNone(ret) ? 0 : addHeapObject(ret);
+};
+
+export function __wbg_setstrokeStyle_b7f2ba53250c124b(arg0, arg1) {
+    getObject(arg0).strokeStyle = getObject(arg1);
 };
 
 export function __wbg_setlineWidth_b1749d46786b7fb3(arg0, arg1) {

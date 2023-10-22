@@ -1,13 +1,22 @@
 import { Shape, Canvas, compute_spectrum_js } from "fourier-front-end";
 import { avatar } from "./avatar.js";
 
+let DARKMODE = false;
+if (
+  window.matchMedia &&
+  window.matchMedia("(prefers-color-scheme: dark)").matches
+) {
+  DARKMODE = true;
+}
+
+let colors = {
+  face: DARKMODE ? "white" : "black",
+  epicycles: "black",
+};
+
 // animation ticker
 let time = 0;
 let path = [];
-
-function lerp(a, b, t) {
-  return a + (b - a) * t;
-}
 
 function epicycles(x, y, rotation, fourier, draw = true) {
   // For each epicycle in the fourier series, we will draw a circle.
@@ -16,8 +25,8 @@ function epicycles(x, y, rotation, fourier, draw = true) {
     let prev_y = y;
 
     const freq = 1 * fourier[i].freq;
-    // Scale down our drawing, by a factor of 100.
-    const radius = fourier[i].amp / 10;
+    // Scale down the drawing
+    const radius = fourier[i].amp / 9;
     const phase = fourier[i].phase;
 
     x += radius * Math.cos(freq * time + phase + rotation);
@@ -63,8 +72,9 @@ function genFourier(d) {
 // Requires a canvas element with id="canvas"
 let canvas = new Canvas("dft_logo_canvas");
 
-let centerX = canvas.width() / 2;
-let centerY = canvas.height() / 2;
+// offset
+let centerX = canvas.width() / 2 - 30;
+let centerY = canvas.height() / 2 - 10;
 
 // This will "decompose" our input signal into its constituent waves.
 let d = compute_spectrum_js({
@@ -95,7 +105,7 @@ function step(currentFrameTime) {
   }
 
   // skip this frame if not enough time has passed since last frame
-  // this has the effect of sloing down the animation.
+  // this has the effect of slowing down the animation.
   if (
     lastFrameTime !== null &&
     currentFrameTime - lastFrameTime < (1000 / 60) * speedFactor
@@ -149,7 +159,10 @@ function step(currentFrameTime) {
   let offset = 0;
 
   shape.begin_shape(center_x, center_y);
+  shape.set_stroke_style(colors.face);
+
   canvas.set_line_width(1.0 / (scale * 0.5));
+  //canvas.set_line_width(10);
 
   for (let i = 0; i < path.length; i++) {
     // check if subsequent points are nearby on the x axis, if they are far apart, move the pen to the new point without drawing it.
@@ -174,6 +187,8 @@ function step(currentFrameTime) {
   // Restore translation
   track && canvas.translate(-dx, -dy);
   canvas.set_line_width(1.0 / scale);
+  // Restore line color
+  shape.set_stroke_style(colors.epicycles);
 
   window.requestAnimationFrame(step);
 }
