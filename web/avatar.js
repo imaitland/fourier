@@ -3158,12 +3158,43 @@ const raw = Array.from(data3.matchAll(regex), (m) => [
   parseFloat(m[3]),
 ]);
 
+console.log("RAW:", raw);
+
 //export const avatar = raw.sort((a, b) => a[0] - b[0]);
 // offset all y coords in raw by 100 up
 export const avatar = raw.map((p) => [p[0] - 1000, p[1] - 1000]);
 
+function addMidpoints(points) {
+  // Check if the array has less than 2 points, in which case midpoints cannot be calculated
+  if (points.length < 2) return points;
+
+  const newPoints = [];
+
+  for (let i = 0; i < points.length - 1; i++) {
+    // Add the current point
+    newPoints.push(points[i]);
+
+    // Calculate the midpoint
+    const midpoint = [
+      (points[i][0] + points[i + 1][0]) / 2,
+      (points[i][1] + points[i + 1][1]) / 2,
+    ];
+
+    // Add the midpoint
+    newPoints.push(midpoint);
+  }
+
+  // Add the last point from the original array
+  newPoints.push(points[points.length - 1]);
+
+  return newPoints;
+}
+
+// Example usage
+const doubleAvatar = addMidpoints(avatar);
+
 export const offsetAvatar = (offset) => {
-  let av = [...avatar];
+  let av = [...doubleAvatar];
   let init = 0;
   while (init < offset) {
     av.push(av.shift());
