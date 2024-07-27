@@ -11,13 +11,18 @@
       rel="stylesheet"
     />
 
+    <link
+      href="https://fonts.googleapis.com/css2?family=B612&display=swap"
+      rel="stylesheet"
+    />
+
     <script src="./bootstrap.js"></script>
 
     <style>
       body {
-        background-color: black;
-        font-family: "B612 Mono", monospace;
-        font-size: 1.8em;
+        background-color: rgb(30, 30, 30);
+        font-family: "B612";
+        font-size: 1em;
         color: white;
       }
       html {
@@ -29,14 +34,38 @@
         width: 100%;
         height: 62vh; /* 62% of the viewport height */
         background-color: black;
+        border-radius: 5px;
       }
+      .bio {
+        max-width: 80%;
+        font-family: "B612";
+      }
+
+      .text_title {
+        font-family: "B612 Mono";
+      }
+
       canvas {
         width: 100%;
         height: 100%;
       }
-      .title {
+
+      .blogroll {
+        width: 100%;
+        margin-top: 20px;
+        margin-left: 12px;
       }
+
+      .contact_and_links {
+        display: flex;
+        justify-content: space-between;
+        max-width: 80%;
+      }
+
       @media screen and (min-width: 768px) {
+        .blogroll {
+          width: 50%;
+        }
         .container {
           width: 50%; /* 50% of the screen width on desktop */
           height: 100%;
@@ -51,7 +80,27 @@
     <div class="container">
       <canvas id="dft_logo_canvas"></canvas>
     </div>
-    <h1 class="title">iain</h1>
+    <div class="blogroll">
+      <div class="text_title">Iain Maitland</div>
+      <div class="bio">
+        I am a research software engineer at Johns Hopkins University Data
+        Science and AI Institute. Before that I was a front end engineer at AWS.
+      </div>
+
+      <div class="contact_and_links">
+        <div class="links">
+          <div class="text_title">links</div>
+          <div>photos</div>
+          <div>paintings</div>
+          <div>films</div>
+        </div>
+        <div class="contact">
+          <div class="text_title">contact</div>
+          <div class="contact">hi@iainmaitland.com</div>
+        </div>
+      </div>
+      <div class="blog_title text_title">blog</div>
+    </div>
     <script>
       const canvas = document.getElementById("dft_logo_canvas");
       const context = canvas.getContext("2d");

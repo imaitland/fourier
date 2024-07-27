@@ -17,7 +17,7 @@ let colors = {
 let path = [];
 
 function epicycles(x, y, rotation, fourier, draw = true, scaleFactor, time) {
-  canvas.set_line_width(0.3);
+  canvas.set_line_width(1);
   // For each epicycle in the fourier series, we will draw a circle.
   for (let i = 0; i < fourier.length; i++) {
     let prev_x = x;
@@ -72,7 +72,7 @@ function genFourier(d) {
 let canvas = new Canvas("dft_logo_canvas");
 
 // offset
-let centerX = canvas.width() / 2 - 30;
+let centerX = canvas.width() / 2;
 let centerY = canvas.height() / 2 - 10;
 
 // This will "decompose" our input signal into its constituent waves.
@@ -81,7 +81,7 @@ let d = compute_spectrum_js({
 });
 let fourier = genFourier(d);
 
-const maxPathLength = fourier.length;
+const maxPathLength = fourier.length * 20;
 
 let lastFrameTime = null;
 let speedFactor = 2.9; // increase this to slow down the animation
@@ -107,8 +107,8 @@ function step(currentFrameTime) {
   epicycles(x, y, 0, fourier, true, scaleFactor, time);
 
   // Draw the wave.
-  const center_x = 100;
-  const center_y = 100;
+  const center_x = 0;
+  const center_y = 0;
 
   // add to beginning.
   path.unshift(vx);
@@ -152,6 +152,22 @@ function step(currentFrameTime) {
 }
 
 window.requestAnimationFrame(step);
+window.addEventListener("mousemove", ({ screenX, screenY }) => {
+  canvas = new Canvas("dft_logo_canvas");
+  centerX = canvas.width() / 2 + screenX / 7;
+  centerY = canvas.height() / 2 + screenY / 7;
+});
+
+window.addEventListener(
+  "resize",
+  () => {
+    canvas = new Canvas("dft_logo_canvas");
+    centerX = canvas.width() / 2;
+    centerY = canvas.height() / 2;
+    scaleFactor = Math.min(canvas.width(), canvas.height()) / 7000; // Adjust according to your preference
+  },
+  false
+);
 
 /*
 window.addEventListener("mousemove", step);
