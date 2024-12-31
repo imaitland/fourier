@@ -2,67 +2,41 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Hello Fourier</title>
+    <title>iain maitland</title>
     <link rel="stylesheet" href="./styles.css" />
+    <style>
+      /* Make sure the html and body take the full height of the browser */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+
+      /* The container with flex display to center horizontally and vertically */
+      #flex-container {
+        display: flex;
+        justify-content: center; /* centers horizontally */
+        align-items: center;    /* centers vertically */
+        height: 100%;           /* fill the full viewport height */
+        width: 100%;            /* fill the full viewport width */
+      }
+
+      /* Optional: remove default padding/margins from p if needed */
+      p {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
   </head>
   <body>
-    <noscript
-      >This page contains webassembly and javascript content, please enable
-      javascript in your browser.</noscript
-    >
+    <noscript>
+      This page contains webassembly and javascript content, please enable
+      javascript in your browser.
+    </noscript>
     <script src="./bootstrap.js"></script>
-    <h1>Fourier Transforms and Epicycles</h1>
+
     <div id="flex-container">
-      <p>Convergence of the Fourier Series</p>
-      <p>
-        <input
-          type="range"
-          min="1"
-          max="10"
-          value="2"
-          id="slider"
-          oninput="this.nextElementSibling.value = this.value"
-        />
-        <output>2</output>
-      </p>
-      <p>
-        <canvas
-          id="canvas"
-          height="240"
-          width="600"
-          style="border: 1px solid #000000"
-        ></canvas>
-      </p>
-    </div>
-    <div id="flex-container">
-      <p>Discrete Fourier Transform of Random Input Signal</p>
-      <p>
-        <button id="randomize">randomize</button>
-      </p>
-      <p>
-        <canvas
-          id="dft_canvas"
-          height="240"
-          width="600"
-          style="border: 1px solid #000000"
-        ></canvas>
-      </p>
-    </div>
-    <!--
-    <div id="flex-container">
-      <p>Discrete Fourier Transform of Complex Input Signal</p>
-      <div>
-        <canvas
-          id="dft_complex_canvas"
-          height="400"
-          width="600"
-          style="border: 1px solid #000000"
-        ></canvas>
-      </div>
-    </div>
-    -->
-    <div id="flex-container">
-      <p>Discrete Fourier Transform of x,y coordinate signal</p>
       <p>
         <canvas
           id="dft_svg_canvas"
