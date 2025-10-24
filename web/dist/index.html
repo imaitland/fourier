@@ -10,16 +10,6 @@
       body {
         margin: 0;
         padding: 0;
-        height: 100%;
-      }
-
-      /* The container with flex display to center horizontally and vertically */
-      #flex-container {
-        display: flex;
-        justify-content: center; /* centers horizontally */
-        align-items: center;    /* centers vertically */
-        height: 100%;           /* fill the full viewport height */
-        width: 100%;            /* fill the full viewport width */
       }
 
       /* Optional: remove default padding/margins from p if needed */
@@ -38,13 +28,10 @@
 
     <div id="flex-container">
       <p>
-        <canvas
-          id="dft_svg_canvas"
-          height="400"
-          width="600"
-          style="border: 1px solid #000000"
-        ></canvas>
+        <canvas id="dft_svg_canvas"></canvas>
       </p>
+      <div id="blog-roll">
+      </div>
     </div>
   </body>
 </html>

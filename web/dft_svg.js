@@ -13,8 +13,9 @@ function epicycles(x, y, rotation, fourier) {
     let prev_y = y;
 
     const freq = fourier[i].freq;
-    // Scale down our drawing, by a factor of 100.
-    const radius = fourier[i].amp / 10;
+    // Scale down our drawing, by a factor of 10 (or 20 on mobile for additional scaling)
+    const radiusDivisor = isMobile ? 20 : 10;
+    const radius = fourier[i].amp / radiusDivisor;
     const phase = fourier[i].phase;
 
     x += radius * Math.cos(freq * time + phase + rotation);
@@ -55,8 +56,9 @@ function genFourier(d) {
   return fourier;
 }
 
-// Requires a canvas element with id="canvas"
-let canvas = new Canvas("dft_svg_canvas");
+// Get canvas element and set dynamic size
+const canvasElement = document.getElementById("dft_svg_canvas");
+const isMobile = window.innerWidth < 700;
 
 let input_signal = avatar;
 
@@ -66,12 +68,35 @@ let fourier = genFourier(d);
 
 const maxPathLength = fourier.length;
 
+// Calculate the maximum extent of epicycles (sum of all radii)
+const radiusDivisor = isMobile ? 20 : 10;
+const maxRadius = fourier.reduce((sum, f) => sum + f.amp / radiusDivisor, 0);
+
+// Set canvas size - ensure height is sufficient for epicycles
+const canvasWidth = Math.min(window.innerWidth - 40, 1400); // Max 1400px, with 40px padding
+const minHeight = (maxRadius * 2) + 40; // Ensure enough height for epicycles with padding
+const canvasHeight = Math.max(minHeight, isMobile ? 400 : 600); // Use larger of minimum or default
+canvasElement.width = canvasWidth;
+canvasElement.height = canvasHeight;
+
+// Requires a canvas element with id="canvas"
+let canvas = new Canvas("dft_svg_canvas");
+
 function step() {
   let draw = true;
   canvas.clear();
 
-  let x = 140;
-  let y = 200;
+  // Dynamic positioning to prevent clipping
+  // Ensure epicycles start far enough from edges (need maxRadius padding on all sides)
+  const padding = 20;
+  const minX = maxRadius + padding; // Left edge protection
+  const maxX = canvasWidth - maxRadius - padding; // Right edge protection (accounting for path)
+  const minY = maxRadius + padding; // Top edge protection
+  const maxY = canvasHeight - maxRadius - padding; // Bottom edge protection
+
+  const idealX = isMobile ? canvasWidth * 0.15 : canvasWidth * 0.2;
+  let x = Math.max(minX, Math.min(idealX, maxX)); // Clamp between min and max
+  let y = Math.max(minY, Math.min(canvasHeight / 2, maxY)); // Clamp vertically
 
   // Epicycles returns the last point in that sequence of epicycles.
   let vx = epicycles(x, y, 0, fourier);
@@ -88,7 +113,10 @@ function step() {
   }
 
   let shape = new Shape("dft_svg_canvas");
-  let offset = 270;
+  // Dynamic offset: maximize distance between epicycles and path
+  // Ensure we have room for both epicycles and path
+  const availableSpace = canvasWidth - x - maxRadius - padding;
+  let offset = Math.min(isMobile ? canvasWidth * 0.6 : canvasWidth * 0.5, availableSpace);
 
   shape.begin_shape(center_x, center_y);
 
