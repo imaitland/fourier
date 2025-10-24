@@ -72,10 +72,9 @@ const maxPathLength = fourier.length;
 const radiusDivisor = isMobile ? 20 : 10;
 const maxRadius = fourier.reduce((sum, f) => sum + f.amp / radiusDivisor, 0);
 
-// Set canvas size - ensure height is sufficient for epicycles
+// Set canvas size - keep it simple like original working version
 const canvasWidth = Math.min(window.innerWidth - 40, 1400); // Max 1400px, with 40px padding
-const minHeight = (maxRadius * 2) + 40; // Ensure enough height for epicycles with padding
-const canvasHeight = Math.max(minHeight, isMobile ? 400 : 600); // Use larger of minimum or default
+const canvasHeight = isMobile ? 400 : 500; // Fixed heights
 canvasElement.width = canvasWidth;
 canvasElement.height = canvasHeight;
 
@@ -86,24 +85,14 @@ function step() {
   let draw = true;
   canvas.clear();
 
-  // Dynamic positioning to prevent clipping
-  // Ensure epicycles start far enough from edges (need maxRadius padding on all sides)
-  const padding = 20;
-  const minX = maxRadius + padding; // Left edge protection
-  const maxX = canvasWidth - maxRadius - padding; // Right edge protection (accounting for path)
-  const minY = maxRadius + padding; // Top edge protection
-  const maxY = canvasHeight - maxRadius - padding; // Bottom edge protection
-
-  const idealX = isMobile ? canvasWidth * 0.15 : canvasWidth * 0.35;
-  let x = Math.max(minX, Math.min(idealX, maxX)); // Clamp between min and max
-  let y = Math.max(minY, Math.min(canvasHeight / 2, maxY)); // Clamp vertically
+  // Use simple fixed positioning like original working version
+  let x = isMobile ? canvasWidth * 0.2 : 200;
+  let y = isMobile ? canvasHeight * 0.4 : 250;
 
   // Epicycles returns the last point in that sequence of epicycles.
   let vx = epicycles(x, y, 0, fourier);
 
   // Draw the wave.
-  const center_x = 100;
-  const center_y = 100;
   // add to beginning.
   path.unshift(vx);
 
@@ -113,10 +102,12 @@ function step() {
   }
 
   let shape = new Shape("dft_svg_canvas");
-  // Dynamic offset: maximize distance between epicycles and path
-  // Ensure we have room for both epicycles and path
-  const availableSpace = canvasWidth - x - maxRadius - padding;
-  let offset = Math.min(isMobile ? canvasWidth * 0.6 : canvasWidth * 0.5, availableSpace);
+  // Use simple fixed offset like original
+  let offset = isMobile ? canvasWidth * 0.5 : 350;
+
+  // Draw the wave
+  const center_x = 100;
+  const center_y = 100;
 
   shape.begin_shape(center_x, center_y);
 
