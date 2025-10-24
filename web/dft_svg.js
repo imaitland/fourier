@@ -94,7 +94,7 @@ function step() {
   const minY = maxRadius + padding; // Top edge protection
   const maxY = canvasHeight - maxRadius - padding; // Bottom edge protection
 
-  const idealX = isMobile ? canvasWidth * 0.15 : canvasWidth * 0.2;
+  const idealX = isMobile ? canvasWidth * 0.15 : canvasWidth * 0.35;
   let x = Math.max(minX, Math.min(idealX, maxX)); // Clamp between min and max
   let y = Math.max(minY, Math.min(canvasHeight / 2, maxY)); // Clamp vertically
 
